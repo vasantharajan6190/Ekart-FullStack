@@ -4,7 +4,7 @@ import {logincontext} from "../../Contextapi"
 import {useHistory} from "react-router-dom"
 import {createcontext} from "../../containers/homepage/homepage" 
 import "./card.css"
-import axios from "axios"
+import axios from "../../../../server/node_modules/axios"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCartPlus,faHeart,faBan } from '@fortawesome/free-solid-svg-icons'
 

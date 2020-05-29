@@ -1,13 +1,9 @@
-const express =require("express")
-const app = express()
+const router = require("express").Router()
 const bcrypt = require("bcrypt")
-const cors = require("cors")
-const pool = require("./db")
-app.use(cors())
-app.use(express.json())
+const pool = require("../models/db")
 
 //Register Route
-app.post("/register",async (req,res)=>{
+router.post("/register",async (req,res)=>{
     const {email,name,password,mobile} = req.body
     try{
     const users =await pool.query("SELECT * FROM users WHERE users.email=$1",[email])
@@ -31,7 +27,7 @@ catch(error){
 }
 })
 //Login Route
-app.post("/login",async(req,res)=>{
+router.post("/login",async(req,res)=>{
     const {email,password} = req.body
     try {
         const user = await pool.query("SELECT * FROM users WHERE users.email = $1",[email])
@@ -56,12 +52,12 @@ app.post("/login",async(req,res)=>{
 
 //items section
 //view all items
-app.get("/items",async (req,res)=>{
+router.get("/items",async (req,res)=>{
     const items = await pool.query("SELECT title,img,rating,price,favback,cartback FROM items")
     res.json(items.rows)
 })
 //create items
-app.post("/items",async(req,res)=>{
+router.post("/items",async(req,res)=>{
     const {title,img,price,rating,currentname} = req.body
     try {
         const check = await pool.query("SELECT * FROM items WHERE items.title=$1",[title])
@@ -81,7 +77,7 @@ app.post("/items",async(req,res)=>{
 
 //favourites section
 //fav by user
-app.get("/fav",async(req,res)=>{
+router.get("/fav",async(req,res)=>{
     const currentname = req.query.search
     try {
         const user = await pool.query("SELECT user_id FROM users WHERE email=$1",[currentname])
@@ -94,7 +90,7 @@ app.get("/fav",async(req,res)=>{
     }
 })
 //add to fav
-app.post("/fav",async(req,res)=>{
+router.post("/fav",async(req,res)=>{
     const {title,img,rating,price,currentname} = req.body
     try {
     
@@ -108,7 +104,7 @@ app.post("/fav",async(req,res)=>{
     }
 })
 //delete from fav
-app.delete("/fav",async(req,res)=>{
+router.delete("/fav",async(req,res)=>{
     const favid = req.query.favid
     const userid = req.query.userid
     const response = await pool.query("DELETE FROM fav WHERE fav.title=$1 AND fav.user_id=$2 RETURNING *",[favid,userid])
@@ -118,7 +114,7 @@ app.delete("/fav",async(req,res)=>{
 
 //cart section
 //cart by user
-app.get("/cart",async(req,res)=>{
+router.get("/cart",async(req,res)=>{
     const currentname = req.query.search
     try {
         const user = await pool.query("SELECT user_id FROM users WHERE email=$1",[currentname])
@@ -131,7 +127,7 @@ app.get("/cart",async(req,res)=>{
     }
 })
 //add to cart
-app.post("/cart",async(req,res)=>{
+router.post("/cart",async(req,res)=>{
     const {title,img,rating,price,currentname} = req.body
     try {
     
@@ -145,13 +141,11 @@ app.post("/cart",async(req,res)=>{
     }
 })
 //delete from cart
-app.delete("/cart",async(req,res)=>{
+router.delete("/cart",async(req,res)=>{
     const favid = req.query.favid
     const userid = req.query.userid
     const response = await pool.query("DELETE FROM cart WHERE cart.title=$1 AND cart.user_id=$2 RETURNING *",[favid,userid])
     res.json("Data Deleted")
 })
 
-app.listen(5000,()=>{
-    console.log("Server Started")
-})
+module.exports = router
